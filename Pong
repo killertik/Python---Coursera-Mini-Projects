@@ -1,0 +1,207 @@
+# Implementation of classic arcade game Pong
+# An introduction to interactive programming in python
+# Week four mini-project by Tom S.
+
+import simplegui
+import random
+
+LEFT = False
+RIGHT = True
+
+# frame globals
+WIDTH = 600
+HEIGHT = 400       
+
+# paddles globals
+PAD_WIDTH = 8
+PAD_HEIGHT = 80
+HALF_PAD_WIDTH = PAD_WIDTH / 2
+HALF_PAD_HEIGHT = PAD_HEIGHT / 2
+
+# ball globals
+BALL_RADIUS = 20
+ball_pos = [0,0]
+ball_vel = [0,0]
+
+# score globals
+score1 = 0
+score2 = 0
+
+# paddles pos and vel globals
+paddle1_pos = HEIGHT/2
+paddle2_pos = HEIGHT/2
+paddle1_vel = 0
+paddle2_vel = 0
+
+# time global and image import
+time = 0
+image = simplegui.load_image('https://djr1og.by3302.livefilestore.com/y3mYbVCQ_N-CK26xQIMqm2pc9Rt5H0VUNX9l29NmzZBJ7rC3qKsSsKr4b75NX0_pG_5UrCERMPbexZsHdSPRUN2lxK8WwrHWLu9RCwdKR3MFg-Gbjtdk5RMNiBDBT_xOSkVCUux8UW3jJHbQoSLL75Aqw/overview2-600x400.jpg')
+
+# initialize ball_pos and ball_vel for new bal in middle of table
+# if direction is RIGHT, the ball's velocity is upper right, else upper left
+def spawn_ball(direction):
+    global ball_pos, ball_vel 
+    ball_pos = [WIDTH / 2, HEIGHT / 2]
+    horizontal = random.randrange(120, 240)/60.0
+    vertical = -random.randrange(60, 180)/60.0
+    if direction == "LEFT":
+        horizontal = -horizontal
+    elif direction == "RIGHT":
+        horizontal = horizontal  
+    ball_vel = [horizontal, vertical]
+
+# helper function to start game. Calls spawn_ball with random direction on start
+def new_game():
+    global paddle1_pos, paddle2_pos, paddle1_vel, paddle2_vel  # these are numbers
+    global score1, score2  # these are ints
+    global time
+    score1 = 0
+    score2 = 0
+    paddle1_pos = HEIGHT/2
+    paddle2_pos = HEIGHT/2
+    paddle1_vel = 0
+    paddle2_vel = 0
+    spawn_ball(random.choice(["LEFT","RIGHT"])) # new game ball will go randomly right or left
+    timer.stop()
+    time=0
+    timer.start()
+
+# functions for timer
+def timer_handler():
+    global time
+    time += 1  
+
+def timer_format(t):
+    y = int(t / 10)
+    minute = int(y / 60)
+    second = y % 60
+    millisecond = t % 10   
+    if(second < 10):
+        secondone = "0" + str(second)
+    else:
+        secondone = str(second)   
+    return str(minute) + ":" + secondone + "." + str(millisecond)  
+    
+# The draw handler. Main function here.    
+def draw(canvas):
+    global score1, score2
+    global paddle1_pos, paddle2_pos, ball_pos, ball_vel, paddle1_vel, paddle2_vel 
+    global BALL_RADIUS, WIDTH, PAD_WIDTH, HALF_PAD_HEIGHT, HALF_PAD_WIDTH
+    
+    # draw background image
+    canvas.draw_image(image, (WIDTH/2, HEIGHT/2), (WIDTH, HEIGHT), (WIDTH/2, HEIGHT/2), (WIDTH, HEIGHT))
+    
+    # draw timer
+    canvas.draw_text(timer_format(time), (280,60), 15, "Grey")
+       
+    # draw mid circle and gutters
+    canvas.draw_circle((WIDTH / 2, HEIGHT / 2), 10, 5, 'Silver', 'Silver')
+    canvas.draw_line([PAD_WIDTH, 0],[PAD_WIDTH, HEIGHT], 1, "White")
+    canvas.draw_line([WIDTH - PAD_WIDTH, 0],[WIDTH - PAD_WIDTH, HEIGHT], 1, "White")
+    
+    # draw left and right paddles
+    canvas.draw_line([HALF_PAD_WIDTH, paddle1_pos - HALF_PAD_HEIGHT], 
+                    [HALF_PAD_WIDTH, paddle1_pos + HALF_PAD_HEIGHT], 
+                    PAD_WIDTH, "White")
+    canvas.draw_line([WIDTH - HALF_PAD_WIDTH, paddle2_pos - HALF_PAD_HEIGHT], 
+                    [WIDTH - HALF_PAD_WIDTH, paddle2_pos + HALF_PAD_HEIGHT], 
+                    PAD_WIDTH, "White")
+    
+    # draw ball
+    canvas.draw_circle(ball_pos, BALL_RADIUS, 1, "White", "White")
+    
+    # update ball
+    ball_pos[0] += ball_vel[0]
+    ball_pos[1] += ball_vel[1] 
+       
+    # update paddle's vertical position, keep paddle on the screen
+    if paddle1_pos < (HALF_PAD_HEIGHT) and paddle1_vel < 0:
+        paddle1_vel = 0
+    elif paddle2_pos < (HALF_PAD_HEIGHT) and paddle2_vel < 0:
+        paddle2_vel = 0
+    elif paddle1_pos > (HEIGHT - (HALF_PAD_HEIGHT)) and paddle1_vel > 0:
+        paddle1_vel = 0
+    elif paddle2_pos > (HEIGHT - (HALF_PAD_HEIGHT)) and paddle2_vel > 0:
+        paddle2_vel = 0  
+        
+    paddle1_pos += paddle1_vel
+    paddle2_pos += paddle2_vel
+    
+    
+    # BALL-PADDLES COLLISIONS and REFLECTIONS / Gutter collision and score incrementation   
+    if ball_pos[0] <= 28:
+        if ball_pos[1] < (paddle1_pos - 42) or ball_pos[1] > (paddle1_pos + 42):
+            spawn_ball("RIGHT")
+            score2 += 1
+        else:
+            ball_vel[0] = - ball_vel[0] * 1.1 # increase ball velocity after each collision
+        
+    if ball_pos[0] >= 572:
+        if ball_pos[1] < (paddle2_pos - 42) or ball_pos[1] > (paddle2_pos + 42):
+            spawn_ball("LEFT")
+            score1 += 1
+        else:
+            ball_vel[0] = - ball_vel[0] * 1.1 # increase ball velocity after each collision
+    
+    # BALL-FRAME COLLISIONS and REFLECTIONS        
+    # collision with top frame
+    elif ball_pos[1] <= 0 + BALL_RADIUS:
+        ball_vel[1] = - ball_vel[1]
+    # collision with bottom frame
+    elif ball_pos[1] >= HEIGHT -BALL_RADIUS:
+        ball_vel[1] = - ball_vel[1]
+          
+    # draw scores
+    canvas.draw_text(str(score1), [225, 70], 50, "White")    
+    canvas.draw_text(str(score2), [350, 70], 50, "White")
+
+# handler for key down presses
+def keydown(key):
+    global paddle1_vel, paddle2_vel, paddle1_pos, paddle2_pos
+    acc = 6
+    if key == simplegui.KEY_MAP["w"]:
+        paddle1_vel -= acc
+    elif key == simplegui.KEY_MAP["s"]:
+        paddle1_vel += acc
+    
+    if key == simplegui.KEY_MAP["up"]:
+        paddle2_vel -= acc
+    elif key == simplegui.KEY_MAP["down"]:
+        paddle2_vel += acc
+        
+# handler for key release   
+def keyup(key):
+    global paddle1_vel, paddle2_vel
+    
+    if key == simplegui.KEY_MAP["w"]:
+        paddle1_vel = 0
+    elif key == simplegui.KEY_MAP["s"]:
+        paddle1_vel = 0
+    
+    if key == simplegui.KEY_MAP["up"]:
+        paddle2_vel = 0
+    elif key == simplegui.KEY_MAP["down"]:
+        paddle2_vel = 0
+    
+# Create timer
+timer = simplegui.create_timer(100, timer_handler)
+    
+# create frame
+frame = simplegui.create_frame("Pong", WIDTH, HEIGHT)
+frame.set_draw_handler(draw)
+frame.set_keydown_handler(keydown)
+frame.set_keyup_handler(keyup)
+frame.add_button('New game!', new_game, 150)
+label3 = frame.add_label('')
+label4 = frame.add_label('')
+label1 = frame.add_label('Keys "w" and "s" for left paddle!')
+label5 = frame.add_label('')
+label2 = frame.add_label('Keys "up" and "down" for right paddle!')
+label8 = frame.add_label('')
+label9 = frame.add_label('Speed increases after each collision. How far can you go?')
+label6 = frame.add_label('')
+label7 = frame.add_label('Enjoy')
+
+# start frame
+new_game()
+frame.start()
