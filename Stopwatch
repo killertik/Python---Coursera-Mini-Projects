@@ -1,0 +1,68 @@
+# Stopwatch
+
+# import module simplegui
+import simplegui
+
+# globals
+time=0
+score=0
+tries=0
+
+# Timer start
+def start_timer():
+    timer.start()
+    
+# Timer stop
+def stop_timer():
+    timer.stop()
+    global score, tries, time
+    if(time % 10 == 0):
+        score = score + 1
+    tries = tries + 1    
+  
+# Timer reset
+def reset_timer():
+    global time, score, tries
+    timer.stop()
+    time=0
+    score=0
+    tries=0
+            
+# Timer handler for create.timer
+def timer_handler():
+    global time
+    time += 1
+             
+# main function where the time gets formatted
+def format(t):
+    y = int(t / 10)
+    minute = int(y / 60)
+    second = y % 60
+    millisecond = t % 10   
+    if(second < 10):
+        secondone = "0" + str(second)
+    else:
+        secondone = str(second)
+        
+    return str(minute) + ":" + secondone + "." + str(millisecond)  
+    
+# all the stuff that goes into the canvas
+def draw_handler(canvas):
+    canvas.draw_text(str(score)+"/"+str(tries),(240,30), 25, "Green")
+    canvas.draw_text(format(time), (50,150), 75, "White")
+    canvas.draw_text("Stop the watch at the full second!",[75, 250], 10, "White")
+
+# frame creation
+frame = simplegui.create_frame("stopwatch",300,300)
+
+# timer creation
+timer = simplegui.create_timer(100, timer_handler)
+
+# adding buttons and setting draw handler
+frame.add_button("Start", start_timer, 100)
+frame.add_button("Stop", stop_timer, 100)
+frame.add_button("Reset", reset_timer, 100)
+frame.set_draw_handler(draw_handler)
+
+# starting the frame
+frame.start()
