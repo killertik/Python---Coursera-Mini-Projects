@@ -1,0 +1,70 @@
+import simplegui
+import random
+
+# Initialize globals
+WIDTH = 600
+HEIGHT = 400
+BALL_RADIUS = random.randrange(5, 100)
+BALL_RADIUS1 = random.randrange(5, 100)
+BALL_RADIUS2 = random.randrange(5, 100)
+
+ball_pos = [WIDTH / 2, HEIGHT / 2]
+ball1_pos = [WIDTH / 2, HEIGHT / 2]
+ball2_pos = [WIDTH / 2, HEIGHT / 2]
+
+vel = [-30.0 / 60.0,  4.0 / -4.0]
+vel1 = [-40.0 / 30.0,  5.0 / -6.0]
+vel2 = [-70.0 / -20.0,  8.0 / -1.0]
+
+# define event handlers
+def draw(canvas):
+    # Update ball position
+    ball_pos[0] += vel[0]
+    ball_pos[1] += vel[1]
+    ball1_pos[0] += vel1[0]
+    ball1_pos[1] += vel1[1]
+    ball2_pos[0] += vel2[0]
+    ball2_pos[1] += vel2[1]
+    # collide and reflect off left hand side of canvas
+    if ball_pos[0] <= 0 + BALL_RADIUS:
+        vel[0] = - vel[0]
+    elif ball_pos[0] >= WIDTH - BALL_RADIUS:
+        vel[0] = - vel[0]
+    elif ball_pos[1] <= 0 + BALL_RADIUS:
+        vel[1] = - vel[1]
+    elif ball_pos[1] >= HEIGHT -BALL_RADIUS:
+        vel[1] = - vel[1]
+    
+    if ball1_pos[0] <= 0 + BALL_RADIUS1:
+        vel1[0] = - vel1[0]
+    elif ball1_pos[0] >= WIDTH - BALL_RADIUS1:
+        vel1[0] = - vel1[0]
+    elif ball1_pos[1] <= 0 + BALL_RADIUS1:
+        vel1[1] = - vel1[1]
+    elif ball1_pos[1] >= HEIGHT -BALL_RADIUS1:
+        vel1[1] = - vel1[1]
+        
+    if ball2_pos[0] <= 0 + BALL_RADIUS2:
+        vel2[0] = - vel2[0]
+    elif ball2_pos[0] >= WIDTH - BALL_RADIUS2:
+        vel2[0] = - vel2[0]
+    elif ball2_pos[1] <= 0 + BALL_RADIUS2:
+        vel2[1] = - vel2[1]
+    elif ball2_pos[1] >= HEIGHT -BALL_RADIUS2:
+        vel2[1] = - vel2[1]        
+    # collide and reflect off of left hand side of canvas
+    
+
+    
+    # Draw ball
+    canvas.draw_circle(ball_pos, BALL_RADIUS, 3, "Red", "White")
+    canvas.draw_circle(ball1_pos, BALL_RADIUS1, 3, "Blue", "White")
+    canvas.draw_circle(ball2_pos, BALL_RADIUS2, 3, "Purple", "White")
+# create frame
+frame = simplegui.create_frame("Ball physics", WIDTH, HEIGHT)
+
+# register event handlers
+frame.set_draw_handler(draw)
+
+# start frame
+frame.start()
