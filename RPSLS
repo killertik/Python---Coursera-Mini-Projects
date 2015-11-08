@@ -1,0 +1,102 @@
+# Mini-project — Rock-paper-scissors-lizard-Spock
+
+
+"""
+------------Introduction--------------------
+Rock-paper-scissors-lizard-Spock (RPSLS) is a variant 
+of Rock-paper-scissors that allows five choices. 
+Each choice wins against two other choices, 
+loses against two other choices and ties against itself.
+
+The main function will be rpsls() assited by the two 
+helper functions name_to_number(name) and number_to_name(number)
+"""
+
+# ------------BEGIN------------------------
+
+# Let's import the random module since we will need it.
+import random
+
+# The helper function "name_to_number(name)" converts a string (name)
+# into a number in the range 0 to 4 (5 game choices) 
+
+# Here is the conversion list: 
+# 0 — rock
+# 1 — Spock
+# 2 — paper
+# 3 — lizard
+# 4 — scissors
+
+
+def name_to_number(name):
+    if name == "rock":
+        return 0
+    elif name == "Spock":
+        return 1
+    elif name == "paper":
+        return 2
+    elif name == "lizard":
+        return 3
+    elif name == "scissors":
+        return 4
+    else:
+        return "---invalid input---"
+    
+
+# The helper function "number_to_name(number") converts an integer 
+# into a string (name) within the given range. It converts the randomly
+# generated number by the computer into a readable string to be printed 
+# on screen.
+    
+def number_to_name(number):
+    if number == 0:
+        return "rock"
+    elif number == 1:
+        return "Spock"
+    elif number == 2:
+        return "paper"
+    elif number == 3:
+        return "lizard"
+    elif number == 4:
+        return "scissors"
+    else:
+        return "---Invalid input---"
+
+# Main function
+# Does all the necessary number-name conversions
+
+def rpsls(player_choice):
+    print
+    print "Player chooses " + player_choice + "!"
+    player_number = name_to_number(player_choice)
+    comp_number = random.randrange(0,5)
+    comp_choice = number_to_name(comp_number)
+    print "Computer chooses " + comp_choice + "!"
+    
+# Computing the winner is calculating the difference 
+# between comp_number and player_number using modulo arithemtics. 
+# The image here is that of a clock. Arrange all choices around a clock, 
+# 0(rock) goes to position 0 or 12. A choice wins against the two choices
+# going anti-clockwise and loses against the two next choices going clockwise.
+# Since we feed the main function with the player choice, 
+# the if/elif/else statement her gives the win to player for the %result 
+# 1 and 2. Results -1 and -2 will go to the computer.
+    winner = (player_number - comp_number) % 5
+    
+    if winner == 0:
+        return "It's a tie!!!"
+    elif winner == 1:
+        return "Player wins!"
+    elif winner == 2:
+        return "Player wins!"
+    else:
+        return "Computer wins!"
+        
+    
+# Calling the main function rpsls five times with
+# the possible player choices.
+print rpsls("paper")  
+print rpsls("rock") 
+print rpsls("scissors") 
+print rpsls("Spock") 
+print rpsls("lizard") 
