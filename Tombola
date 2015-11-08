@@ -1,0 +1,44 @@
+#!/usr/bin/python
+
+from sets import Set
+import random
+
+names=['Mamm','Papp','Tom','Lisi','Claude','Pierre','Charel', 'Kate', 'Bob', 'Sandy', 'Christin', 'Carole']
+invalidpairs={ 'Mamm': Set(['Papp']),
+               'Papp': Set(['Mamm']),
+               'Lisi': Set(['Bob']),
+               'Bob': Set(['Lisi']),
+               'Tom': Set(['Kate']),
+               'Kate': Set(['Tom']),
+               'Claude': Set(['Sandy']),
+               'Sandy': Set(['Claude']),
+               'Pierre': Set(['Christin']),
+               'Christin': Set(['Pierre']),
+               'Charel': Set(['Carole']),
+               'Carole': Set(['Charel']),}
+
+ok = False
+while not ok:
+    try:
+        # Komm, mir m�schen d'Nimm nach e bessi
+        random.shuffle(names)
+        pairings = {} 
+        availablenames = list(names)
+        curinvalid = {} 
+        # e klengen cheat
+        for person in names:
+            curinvalid[person]=Set(invalidpairs.get(person,Set()))
+            curinvalid[person].add(person)
+        # Hei gin d'Nimm gezunn
+        for person in names:
+            pairings[person] = random.choice(list(Set(availablenames).difference(curinvalid.get(person,Set()))))
+            availablenames.remove(pairings[person])
+            curinvalid[pairings[person]].add(person) # d'Meiglechkeeten A=>B, B=>A elimineieren
+        ok = True
+    except IndexError:
+        continue
+
+for key,val in pairings.iteritems():
+    print "%s=>%s" % (key, val)
+
+     
