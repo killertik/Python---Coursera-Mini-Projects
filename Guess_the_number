@@ -1,0 +1,109 @@
+# Mini-project "Guess the number" 
+# input will come from buttons and an input field
+# all output for the game will be printed in the console
+
+# Let's import the simplegui and random modules
+import simplegui
+import random
+
+# a few globals
+secret_number = 0
+counter = 0
+game_range = 100
+
+print "Welcome to GUESS THE NUMBER! Have fun!"
+
+# helper function to start and restart the game 
+def new_game():
+    global secret_number, counter, game_range
+    secret_number = random.randrange(0, game_range)
+   
+    if game_range == 100:
+        counter = 7
+    elif game_range == 1000:
+        counter = 10
+        
+    print " "
+    print "---------------------------------------------"
+    print "Game restarted in range 0 to ",game_range, " ."
+    print "You have ", counter, " guesses left!" 
+    pass
+   
+# define event handlers for control panel
+def range100():
+    # button that changes the range to [0,100) and starts a new game 
+    global game_range
+    game_range = 100
+    new_game()
+       
+
+def range1000():
+    # button that changes the range to [0,1000) and starts a new game     
+    global game_range
+    game_range = 1000
+    new_game()
+    
+    
+def joke():
+    print " "
+    print "---"
+    print "The programmer got stuck in the shower "
+    print "because the instructions on the shampoo bottle said..."
+    print "Lather, rinse, repeat!"
+    print "---"
+    print " "
+
+    
+def input_guess(guess):
+        # main game logic goes here	
+    global counter, secret_number
+    correct = False
+    
+    print "You guessed: ",guess
+    counter = counter - 1
+    print "Number of remaining guesses is ", counter
+    
+    if isinstance(int(guess), str):
+        print "Enter a integer, not a string, float or other strange stuff."
+        print "....leaving! Please choose a new game!"
+        return 0
+        
+    if int(guess) == secret_number:       
+        correct = True
+    elif int(guess) > secret_number:
+        result = "No, lower!"
+    else:
+        result = "Hmm, higher!"                
+       
+    if correct:
+        print "Correct. YOU WIN!"
+        new_game()
+        return
+    elif counter == 0:
+        print "YOU LOSE! No guesses left!"
+        print "The secret number was: ", secret_number
+        new_game()
+        return
+    else:
+        print result
+        print " "
+        pass
+    
+
+    
+# create frame
+f = simplegui.create_frame("Guess the number", 300, 300)
+
+# register event handlers for control elements and start frame
+
+f.add_button("Range is [0,100)", range100, 150)
+f.add_button("Range is [0,1000)", range1000, 150)
+f.add_input("Enter your guess!", input_guess, 150)
+f.add_button("Press here for joke!", joke, 150)
+
+f.start()
+# call new_game 
+new_game()
+
+
+# always remember to check your completed program against the grading rubric
